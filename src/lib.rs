@@ -42,7 +42,7 @@ This crate provides the `macro_attr!` macro that enables the use of custom, macr
 To use it, make sure you link to the crate like so:
 
 ```rust
-#[macro_use] extern crate macro_attr_2018;
+use macro_attr_2018::macro_attr;
 # macro_rules! Dummy { (() struct $name:ident;) => {}; }
 # macro_attr! { #[derive(Clone, Dummy!)] struct Foo; }
 # fn main() { let _ = Foo; }
@@ -53,7 +53,7 @@ The `macro_attr!` macro should be used to wrap an entire *single* item (`enum`, 
 For example:
 
 ```rust
-#[macro_use] extern crate macro_attr_2018;
+use macro_attr_2018::macro_attr;
 
 // Define some traits to be derived.
 
@@ -88,41 +88,11 @@ macro_rules! ReprType {
         }
     };
 }
-
-// Here is a macro that *modifies* the item.
-
-macro_rules! rename_to {
-    (
-        ($new_name:ident),
-        then $cb:tt,
-        $(#[$($attrs:tt)*])*
-        enum $_old_name:ident $($tail:tt)*
-    ) => {
-        macro_attr_callback! {
-            $cb,
-            $(#[$($attrs)*])*
-            enum $new_name $($tail)*
-        }
-    };
-}
-
-macro_attr! {
-    #[allow(dead_code)]
-    #[derive(Clone, Copy, Debug, ReprType!(u8), TypeName!)]
-    #[rename_to!(Bar)]
-    #[repr(u8)]
-    enum Foo { A, B }
-}
-
-fn main() {
-    let bar = Bar::B;
-    let v = bar as <Bar as ReprType>::Repr;
-    let msg = format!("{}: {:?} ({:?})", Bar::type_name(), bar, v);
-    assert_eq!(msg, "Bar: B (1)");
-}
 ```
 */
+
 #![no_std]
+#![deny(warnings)]
 
 /**
 When given an item definition, including its attributes, this macro parses said attributes and dispatches any attributes or derivations suffixed with `!` to user-defined macros.  This allows multiple macros to process the same item.
@@ -242,13 +212,10 @@ Macro attributes should be used as sparingly as possible: due to the way Rust ma
 #[macro_export]
 macro_rules! macro_attr {
     ($($item:tt)*) => {
-        macro_attr_impl! { $($item)* }
+        $crate::macro_attr_impl! { $($item)* }
     };
 }
 
-/**
-This macro exists as an implementation detail.  This is because if it *wasn't*, then the public-facing `macro_attr!` macro's documentation would be hideously unwieldy.
-*/
 #[doc(hidden)]
 #[macro_export]
 macro_rules! macro_attr_impl {
@@ -265,7 +232,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         const $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (const $($it)*)
@@ -276,7 +243,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         enum $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (enum $($it)*)
@@ -287,7 +254,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         extern $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (extern $($it)*)
@@ -298,7 +265,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         fn $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (fn $($it)*)
@@ -309,7 +276,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         impl $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (impl $($it)*)
@@ -320,7 +287,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         mod $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (mod $($it)*)
@@ -331,7 +298,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         pub $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (pub $($it)*)
@@ -342,7 +309,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         static $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (static $($it)*)
@@ -353,7 +320,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         struct $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (struct $($it)*)
@@ -364,7 +331,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         trait $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (trait $($it)*)
@@ -375,7 +342,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         type $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (type $($it)*)
@@ -386,7 +353,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         use $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (use $($it)*)
@@ -412,7 +379,7 @@ macro_rules! macro_attr_impl {
         $derives:tt,
         $it:tt
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_derive_attrs
             { $non_derives, $it },
             $derives,
@@ -428,7 +395,7 @@ macro_rules! macro_attr_impl {
         ($($derives:tt)*),
         $it:tt
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -446,7 +413,7 @@ macro_rules! macro_attr_impl {
     ) => {
         $mac_attr! {
             (),
-            then (macro_attr_impl! {
+            then ($crate::macro_attr_impl! {
                 @split_attrs_resume
                 $non_derives,
                 $derives,
@@ -466,7 +433,7 @@ macro_rules! macro_attr_impl {
     ) => {
         $mac_attr! {
             ($($attr_args)*),
-            then (macro_attr_impl! {
+            then ($crate::macro_attr_impl! {
                 @split_attrs_resume
                 $non_derives,
                 $derives,
@@ -485,7 +452,7 @@ macro_rules! macro_attr_impl {
     ) => {
         macro_attr_if_proc_macros! {
             proc_macros: {
-                macro_attr_impl! {
+                $crate::macro_attr_impl! {
                     @split_attrs
                     ($(#[$($attrs)*],)*),
                     ($($non_derives)* #[$mac_attr],),
@@ -496,7 +463,7 @@ macro_rules! macro_attr_impl {
             fallback: {
                 $mac_attr! {
                     (),
-                    then (macro_attr_impl! {
+                    then ($crate::macro_attr_impl! {
                         @split_attrs_resume
                         ($($non_derives)*),
                         $derives,
@@ -517,7 +484,7 @@ macro_rules! macro_attr_impl {
     ) => {
         macro_attr_if_proc_macros! {
             proc_macros: {
-                macro_attr_impl! {
+                $crate::macro_attr_impl! {
                     @split_attrs
                     ($(#[$($attrs)*],)*),
                     ($($non_derives)* #[$mac_attr($($attr_args)*)],),
@@ -528,7 +495,7 @@ macro_rules! macro_attr_impl {
             fallback: {
                 $mac_attr! {
                     ($($attr_args)*),
-                    then (macro_attr_impl! {
+                    then ($crate::macro_attr_impl! {
                         @split_attrs_resume
                         ($($non_derives)*),
                         $derives,
@@ -547,7 +514,7 @@ macro_rules! macro_attr_impl {
         $derives:tt,
         $it:tt
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             ($($non_derives)* #[$new_attr],),
@@ -572,7 +539,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         const $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -588,7 +555,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         enum $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -604,7 +571,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         extern $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -620,7 +587,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         fn $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -636,7 +603,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         impl $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -652,7 +619,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         mod $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -668,7 +635,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         pub $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -684,7 +651,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         static $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -700,7 +667,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         struct $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -716,7 +683,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         trait $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -732,7 +699,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         type $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -748,7 +715,7 @@ macro_rules! macro_attr_impl {
         $(#[$($attrs:tt)*])*
         use $($it:tt)*
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*),
             $non_derives,
@@ -771,13 +738,13 @@ macro_rules! macro_attr_impl {
         { ($(#[$($non_derives:tt)*],)*), ($($it:tt)*) },
         ($(,)*), (), ($($user_drvs:tt)*)
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @as_item
             $(#[$($non_derives)*])*
             $($it)*
         }
 
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @expand_user_drvs
             ($($user_drvs)*), ($($it)*)
         }
@@ -787,14 +754,14 @@ macro_rules! macro_attr_impl {
         { ($(#[$($non_derives:tt)*],)*), ($($it:tt)*) },
         ($(,)*), ($($bi_drvs:ident,)+), ($($user_drvs:tt)*)
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @as_item
             #[derive($($bi_drvs,)+)]
             $(#[$($non_derives)*])*
             $($it)*
         }
 
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @expand_user_drvs
             ($($user_drvs)*), ($($it)*)
         }
@@ -804,7 +771,7 @@ macro_rules! macro_attr_impl {
         $fixed:tt,
         (,, $($tail:tt)*), $bi_drvs:tt, $user_drvs:tt
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_derive_attrs
             $fixed, ($($tail)*), $bi_drvs, $user_drvs
         }
@@ -814,7 +781,7 @@ macro_rules! macro_attr_impl {
         $fixed:tt,
         (, $($tail:tt)*), $bi_drvs:tt, $user_drvs:tt
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_derive_attrs
             $fixed, ($($tail)*), $bi_drvs, $user_drvs
         }
@@ -833,7 +800,7 @@ macro_rules! macro_attr_impl {
         $fixed:tt,
         ($new_user:ident ! ($($new_user_args:tt)*), $($tail:tt)*), $bi_drvs:tt, ($($user_drvs:tt)*)
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_derive_attrs
             $fixed, ($($tail)*), $bi_drvs, ($($user_drvs)* $new_user($($new_user_args)*),)
         }
@@ -843,7 +810,7 @@ macro_rules! macro_attr_impl {
         $fixed:tt,
         ($new_user:ident !, $($tail:tt)*), $bi_drvs:tt, ($($user_drvs:tt)*)
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_derive_attrs
             $fixed, ($($tail)*), $bi_drvs, ($($user_drvs)* $new_user(),)
         }
@@ -862,7 +829,7 @@ macro_rules! macro_attr_impl {
     ) => {
         macro_attr_if_proc_macros! {
             proc_macros: {
-                macro_attr_impl! {
+                $crate::macro_attr_impl! {
                     @split_derive_attrs
                     $fixed,
                     ($($tail)*),
@@ -871,7 +838,7 @@ macro_rules! macro_attr_impl {
                 }
             }
             fallback: {
-                macro_attr_impl! {
+                $crate::macro_attr_impl! {
                     @split_derive_attrs
                     $fixed,
                     ($($tail)*),
@@ -893,7 +860,7 @@ macro_rules! macro_attr_impl {
         $fixed:tt,
         ($drv:ident, $($tail:tt)*), ($($bi_drvs:ident,)*), $user_drvs:tt
     ) => {
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @split_derive_attrs
             $fixed,
             ($($tail)*), ($($bi_drvs,)* $drv,), $user_drvs
@@ -917,7 +884,7 @@ macro_rules! macro_attr_impl {
         ($user_drv:ident $arg:tt, $($tail:tt)*), ($($it:tt)*)
     ) => {
         $user_drv! { $arg $($it)* }
-        macro_attr_impl! {
+        $crate::macro_attr_impl! {
             @expand_user_drvs
             ($($tail)*), ($($it)*)
         }
