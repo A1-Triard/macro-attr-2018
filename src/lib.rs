@@ -123,56 +123,12 @@ macro_rules! macro_attr_impl {
 
     (
         $(#[$($attrs:tt)*])*
-        static $($it:tt)*
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (static $($it)*)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)*])*
         struct $($it:tt)*
     ) => {
         $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (struct $($it)*)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)*])*
-        trait $($it:tt)*
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (trait $($it)*)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)*])*
-        type $($it:tt)*
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (type $($it)*)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)*])*
-        use $($it:tt)*
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (use $($it)*)
         }
     };
 
