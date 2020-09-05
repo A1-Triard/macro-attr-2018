@@ -1,13 +1,15 @@
 [package]
+edition = "2018"
 name = "macro-attr-2018"
-version = "0.2.1"
-authors = ["Warlock <internalmike@gmail.com>"]
-
-description = "This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations.  Supercedes the `custom_derive` crate."
-repository = "https://github.com/A1-Triard/macro-attr-2018"
+version = "0.3.0"
+authors = ["warlock <internalmike@gmail.com>"]
+description = "This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations."
+readme = "README.md"
 documentation = "https://docs.rs/crate/macro-attr-2018/"
-license = "MIT OR Apache-2.0"
 keywords = ["custom", "derive", "attribute", "macro"]
+categories = ["rust-patterns", "no-std"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/A1-Triard/macro-attr-2018"
 
 exclude = [
     "local/*",
