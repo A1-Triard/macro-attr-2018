@@ -1,12 +1,12 @@
-/*
-Copyright ⓒ 2016 macro-attr contributors.
+// Copyright (c) 2016 macro-attr contributors.
+// Copyright (c) 2020 Warlock <internalmike@gmail.com>.
+//
+// Licensed under the MIT license (see LICENSE or <http://opensource.org
+// /licenses/MIT>) or the Apache License, Version 2.0 (see LICENSE of
+// <http://www.apache.org/licenses/LICENSE-2.0>), at your option. All
+// files in the project carrying such notice may not be copied, modified,
+// or distributed except according to those terms.
 
-Licensed under the MIT license (see LICENSE or <http://opensource.org
-/licenses/MIT>) or the Apache License, Version 2.0 (see LICENSE of
-<http://www.apache.org/licenses/LICENSE-2.0>), at your option. All
-files in the project carrying such notice may not be copied, modified,
-or distributed except according to those terms.
-*/
 /*!
 This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations.  Supercedes the `custom_derive` crate.
 
@@ -42,7 +42,7 @@ This crate provides the `macro_attr!` macro that enables the use of custom, macr
 To use it, make sure you link to the crate like so:
 
 ```rust
-#[macro_use] extern crate macro_attr;
+#[macro_use] extern crate macro_attr_2018;
 # macro_rules! Dummy { (() struct $name:ident;) => {}; }
 # macro_attr! { #[derive(Clone, Dummy!)] struct Foo; }
 # fn main() { let _ = Foo; }
@@ -53,7 +53,7 @@ The `macro_attr!` macro should be used to wrap an entire *single* item (`enum`, 
 For example:
 
 ```rust
-#[macro_use] extern crate macro_attr;
+#[macro_use] extern crate macro_attr_2018;
 
 // Define some traits to be derived.
 

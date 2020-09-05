@@ -1,13 +1,13 @@
-/*
-Copyright ⓒ 2015 macro-attr contributors.
+// Copyright (c) 2015 macro-attr contributors.
+// Copyright (c) 2020 Warlock <internalmike@gmail.com>.
+//
+// Licensed under the MIT license (see LICENSE or <http://opensource.org
+// /licenses/MIT>) or the Apache License, Version 2.0 (see LICENSE of
+// <http://www.apache.org/licenses/LICENSE-2.0>), at your option. All
+// files in the project carrying such notice may not be copied, modified,
+// or distributed except according to those terms.
 
-Licensed under the MIT license (see LICENSE or <http://opensource.org
-/licenses/MIT>) or the Apache License, Version 2.0 (see LICENSE of
-<http://www.apache.org/licenses/LICENSE-2.0>), at your option. All
-files in the project carrying such notice may not be copied, modified,
-or distributed except according to those terms.
-*/
-#[macro_use] extern crate macro_attr;
+#[macro_use] extern crate macro_attr_2018;
 extern crate rustc_serialize;
 
 macro_rules! StableEncodable {
@@ -81,19 +81,18 @@ macro_rules! StableEncodable {
                 ) -> Result<(), StableEncodableEncoder::Error>
                 where StableEncodableEncoder: rustc_serialize::Encoder {
                     const NUM_FIELDS: usize = StableEncodable!(@count_tts $($fnames)*);
-                    try!(s.emit_struct(stringify!($name), NUM_FIELDS, |s| {
+                    s.emit_struct(stringify!($name), NUM_FIELDS, |s| {
                         // Poor man's enumerate!($($fnames)):
                         let mut idx = 0;
                         $(
-                            try!(s.emit_struct_field(stringify!($fnames), idx, |s| {
+                            s.emit_struct_field(stringify!($fnames), idx, |s| {
                                 self.$fnames.encode(s)
-                            }));
+                            })?;
                             idx += 1;
                         )*
                         let _ = idx;
                         Ok(())
-                    }));
-                    Ok(())
+                    })
                 }
             }
         }
@@ -116,7 +115,7 @@ macro_rules! StableEncodable {
 
     (
         @extract_gen_args $fixed:tt,
-        ($ty_name:ident: $($tail)*)
+        ($ty_name:ident: $($tail:tt)*)
         -> bounds($($bounds:tt)*), ty_clss($($ty_clss:tt)*)
     ) => {
         StableEncodable! {
@@ -304,7 +303,7 @@ macro_rules! StableEncodable {
                     |s| {
                         let mut idx = 0;
                         $(
-                            try!(s.emit_enum_variant_arg(idx, |s| $tup_elems.encode(s)));
+                            s.emit_enum_variant_arg(idx, |s| $tup_elems.encode(s))?;
                             idx += 1;
                         )*
                         let _ = idx;
@@ -329,11 +328,11 @@ macro_rules! StableEncodable {
                     |s| {
                         let mut idx = 0;
                         $(
-                            try!(s.emit_enum_struct_variant_field(
+                            s.emit_enum_struct_variant_field(
                                 stringify!($str_fields),
                                 idx,
                                 |s| $str_fields.encode(s)
-                            ));
+                            )?;
                             idx += 1;
                         )*
                         let _ = idx;

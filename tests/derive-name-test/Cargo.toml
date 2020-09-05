@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Daniel Keep <daniel.keep@gmail.com>"]
 
 [features]
-std = ["macro-attr-2018/std"]
+std = []
 
 [[bin]]
 name = "derive-name-test"
@@ -15,6 +15,6 @@ derive-name-macro = { version = "0.1.0", path = "../derive-name-macro" }
 derive-name-proc = { version = "0.1.0", path = "../derive-name-proc", optional = true }
 
 [dependencies.macro-attr-2018]
-version = "0.2.1"
+version = "0.3.0"
 path = "../.."
 default-features = false
