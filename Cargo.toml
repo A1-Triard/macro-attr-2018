@@ -1,28 +1,23 @@
 [package]
-name = "macro-attr"
+name = "macro-attr-2018"
 version = "0.2.1"
-authors = ["Daniel Keep <daniel.keep@gmail.com>"]
+authors = ["Warlock <internalmike@gmail.com>"]
 
 description = "This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations.  Supercedes the `custom_derive` crate."
-repository = "https://github.com/DanielKeep/rust-custom-derive"
-documentation = "https://docs.rs/crate/macro-attr/"
-license = "MIT/Apache-2.0"
+repository = "https://github.com/A1-Triard/macro-attr-2018"
+documentation = "https://docs.rs/crate/macro-attr-2018/"
+license = "MIT OR Apache-2.0"
 keywords = ["custom", "derive", "attribute", "macro"]
 
 exclude = [
-    ".cargo/*",
     "local/*",
     "doc-pkg/*",
     "scripts/*",
-    ".gitmodules",
-    ".travis.yml",
     "update-docs.py",
 ]
 
 [workspace]
 members = [
-    "enum_derive",
-    "newtype_derive",
     "tests/derive-name-macro",
     "tests/derive-name-proc",
     "tests/derive-name-test",
@@ -31,7 +26,6 @@ members = [
 [features]
 default = ["std"]
 std = []
-unstable-macros-1-1 = []
 
 [dev-dependencies]
 rustc-serialize = "0.3.15"
