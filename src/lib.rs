@@ -733,34 +733,3 @@ macro_rules! macro_attr_impl {
     */
     (@as_item $($i:item)*) => {$($i)*};
 }
-
-/**
-This macro invokes a "callback" macro, merging arguments together.
-
-It takes an arbitrary macro call `(name!(args...))`, plus some sequence of `new_args...`, and expands `name!(args... new_args...)`.
-
-Importantly, it works irrespective of the kind of grouping syntax used for the macro arguments, simplifying macros which need to *capture* callbacks.
-*/
-#[macro_export]
-macro_rules! macro_attr_callback {
-    (
-        ($cb:ident ! { $($cb_fixed:tt)* }),
-        $($args:tt)*
-    ) => {
-        $cb! { $($cb_fixed)* $($args)* }
-    };
-
-    (
-        ($cb:ident ! [ $($cb_fixed:tt)* ]),
-        $($args:tt)*
-    ) => {
-        $cb! [ $($cb_fixed)* $($args)* ]
-    };
-
-    (
-        ($cb:ident ! ( $($cb_fixed:tt)* )),
-        $($args:tt)*
-    ) => {
-        $cb! ( $($cb_fixed)* $($args)* )
-    };
-}
