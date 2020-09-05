@@ -112,23 +112,34 @@ macro_rules! macro_attr_impl {
 
     (
         $(#[$($attrs:tt)*])*
-        pub $($it:tt)*
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (pub $($it)*)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)*])*
         struct $($it:tt)*
     ) => {
         $crate::macro_attr_impl! {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (struct $($it)*)
+        }
+    };
+
+    (
+        $(#[$($attrs:tt)*])*
+        $vis:vis struct $($it:tt)*
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_attrs
+            ($(#[$($attrs)*],)*), (), (),
+            ($vis struct $($it)*)
+        }
+    };
+
+    (
+        $(#[$($attrs:tt)*])*
+        $vis:vis enum $($it:tt)*
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_attrs
+            ($(#[$($attrs)*],)*), (), (),
+            ($vis enum $($it)*)
         }
     };
 

@@ -17,8 +17,18 @@ macro_attr! {
     struct DummyStruct;
 }
 
+macro_attr! {
+    pub enum PubDummyEnum { V }
+}
+
+macro_attr! {
+    pub(crate) struct PubDummyStruct;
+}
+
 #[test]
 fn test_items() {
     let _: DummyEnum = DummyEnum::V;
     let _: DummyStruct = DummyStruct;
+    let _: PubDummyEnum = PubDummyEnum::V;
+    let _: PubDummyStruct = PubDummyStruct;
 }
