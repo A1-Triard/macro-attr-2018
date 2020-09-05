@@ -8,45 +8,9 @@
 // or distributed except according to those terms.
 
 /*!
-This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations.  Supercedes the `custom_derive` crate.
-
-<style type="text/css">
-.link-block { font-family: "Fira Sans"; }
-.link-block > p { display: inline-block; }
-.link-block > p > strong { font-weight: 500; margin-right: 1em; }
-.link-block > ul { display: inline-block; padding: 0; list-style: none; }
-.link-block > ul > li {
-  font-size: 0.8em;
-  background-color: #eee;
-  border: 1px solid #ccc;
-  padding: 0.3em;
-  display: inline-block;
-}
-</style>
-<span></span><div class="link-block">
-
-**Links**
-
-* [Latest Release](https://crates.io/crates/macro-attr/)
-* [Latest Docs](https://docs.rs/crate/macro-attr/)
-* [Repository](https://github.com/DanielKeep/rust-custom-derive)
-
-<span></span></div>
-
-## Compatibility
-
-`macro-attr` is compatible with Rust 1.2 and higher.
+This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations.
 
 ## Quick Example
-
-To use it, make sure you link to the crate like so:
-
-```rust
-use macro_attr_2018::macro_attr;
-# macro_rules! Dummy { (() struct $name:ident;) => {}; }
-# macro_attr! { #[derive(Clone, Dummy!)] struct Foo; }
-# fn main() { let _ = Foo; }
-```
 
 The `macro_attr!` macro should be used to wrap an entire *single* item (`enum`, `struct`, *etc.*) declaration, including its attributes (both `derive` and others).  All attributes and derivations which whose names end with `!` will be assumed to be implemented by macros, and treated accordingly.
 
@@ -69,8 +33,8 @@ trait ReprType {
 
 macro_rules! TypeName {
     // We can support any kind of item we want.
-    (() $(pub)* enum $name:ident $($tail:tt)*) => { TypeName! { @impl $name } };
-    (() $(pub)* struct $name:ident $($tail:tt)*) => { TypeName! { @impl $name } };
+    (() $vis:vis enum $name:ident $($tail:tt)*) => { TypeName! { @impl $name } };
+    (() $vis:vis struct $name:ident $($tail:tt)*) => { TypeName! { @impl $name } };
 
     // Inner rule to cut down on repetition.
     (@impl $name:ident) => {
@@ -82,7 +46,7 @@ macro_rules! TypeName {
 
 macro_rules! ReprType {
     // Note that we use a "derivation argument" here for the `$repr` type.
-    (($repr:ty) $(pub)* enum $name:ident $($tail:tt)*) => {
+    (($repr:ty) $vis:vis enum $name:ident $($tail:tt)*) => {
         impl ReprType for $name {
             type Repr = $repr;
         }
@@ -96,23 +60,6 @@ macro_rules! ReprType {
 
 /**
 When given an item definition, including its attributes, this macro parses said attributes and dispatches any attributes or derivations suffixed with `!` to user-defined macros.  This allows multiple macros to process the same item.
-
-This is similar to, but distinct from, the function of "procedural" macros and compiler plugins.
-
-# Supported Forms
-
-In particular, this macro looks for two kinds of syntax:
-
-- Derivations such as the `Name` in `#[derive(Name!)]` or `#[derive(Name!(...))]`.
-- Top-level attributes written as `#[name!]` or `#![name!(...)]`.
-
-Unlike "real" attributes, optional parenthesised arguments after the `!` are allowed to be entirely arbitrary token trees, meaning they can effectively contain any token sequence.  These are supported to allow custom attribute macros to easily take arguments.
-
-Derivations parse the item and emit whatever additional definitions needed.  They *cannot* change the item itself, and do not receive any other attributes attached to the item.
-
-Attributes receive *everything* lexically *after* themselves, and must re-emit the item.  This allows attributes to make changes to the item, drop or alter other attributes, *etc.*.  This power makes writing attribute macros more difficult, however.
-
-# Macro Derivations
 
 Given the following input:
 
@@ -136,78 +83,6 @@ Note that macro derives may be mixed with regular derives, or put in their own `
 A macro derivation invoked *without* arguments will be treated as though it was invoked with empty parentheses.  *i.e.* `#[derive(Name!)]` is equivalent to `#[derive(Name!())]`.
 
 A derivation macro may expand to any number of new items derived from the provided input.  There is no way for a derivation macro to alter the item itself (for that, use a macro attribute).
-
-# Macro Attributes
-
-When `macro_attr!` encounters an attribute suffixed with a `!` (*e.g.* `#[name!(args...)]`), it invokes the macro `name!` with everything lexically *after* that attribute.  A macro attribute is free to add to, remove from, or alter the provided input as it sees fit, before instructing `macro_attr!` to resume parsing.
-
-For example, given the following input:
-
-```ignore
-#[make_unitary!]
-#[repr(C)]
-#[rename_to!(Quux)]
-#[doc="Test."]
-struct Bar { field: i32 }
-```
-
-`macro_attr!` will expand to:
-
-```ignore
-make_unitary! {
-    (), then $resume,
-    #[repr(C)]
-    #[rename_to!(Quux)]
-    #[doc="Test."]
-    struct Bar { field: i32 };
-}
-```
-
-Note that `$resume` is **not** literal.  When implementing an attribute macro, you should accept this part as `$resume:tt`, and not attempt to inspect or deconstruct the contents.
-
-Assuming `make_unitary!` removes the body of the `struct` it is attached to, `macro_attr!` *requires* that it expand to:
-
-```ignore
-macro_attr_callback! {
-    $resume,
-    #[repr(C)]
-    #[rename_to!(Quxx)]
-    #[doc="Test."]
-    struct Bar;
-}
-```
-
-`macro_attr!` will then resume parsing, and expand to:
-
-```ignore
-rename_to! {
-    (Quxx), then $resume,
-    #[doc="Test."]
-    struct Bar;
-}
-```
-
-Assuming `rename_to!` does the obvious thing and changes the name of the item it is attached to, it should expand to:
-
-```ignore
-macro_attr_callback! {
-    $resume,
-    #[doc="Test."]
-    struct Quxx;
-}
-```
-
-Once more, `macro_attr!` will resume, and produce the final expansion of:
-
-```ignore
-#[repr(C)]
-#[doc="Test."]
-struct Quxx;
-```
-
-Note that normal attributes are automatically carried through and re-attached to the item.
-
-Macro attributes should be used as sparingly as possible: due to the way Rust macros work, they must expand recursively in sequence, which can quickly consume the available macro recursion limit.  This limit can be raised, but it makes for a less-than-ideal user experience if you are authoring macros to be used by others.
 */
 #[macro_export]
 macro_rules! macro_attr {
@@ -450,28 +325,15 @@ macro_rules! macro_attr_impl {
         $derives:tt,
         ($($it:tt)*)
     ) => {
-        macro_attr_if_proc_macros! {
-            proc_macros: {
-                $crate::macro_attr_impl! {
-                    @split_attrs
-                    ($(#[$($attrs)*],)*),
-                    ($($non_derives)* #[$mac_attr],),
-                    $derives,
-                    $($it)*
-                }
-            }
-            fallback: {
-                $mac_attr! {
-                    (),
-                    then ($crate::macro_attr_impl! {
-                        @split_attrs_resume
-                        ($($non_derives)*),
-                        $derives,
-                    }),
-                    $(#[$($attrs)*])*
-                    $($it)*
-                }
-            }
+        $mac_attr! {
+            (),
+            then ($crate::macro_attr_impl! {
+                @split_attrs_resume
+                ($($non_derives)*),
+                $derives,
+            }),
+            $(#[$($attrs)*])*
+            $($it)*
         }
     };
 
@@ -482,28 +344,15 @@ macro_rules! macro_attr_impl {
         $derives:tt,
         ($($it:tt)*)
     ) => {
-        macro_attr_if_proc_macros! {
-            proc_macros: {
-                $crate::macro_attr_impl! {
-                    @split_attrs
-                    ($(#[$($attrs)*],)*),
-                    ($($non_derives)* #[$mac_attr($($attr_args)*)],),
-                    $derives,
-                    $($it)*
-                }
-            }
-            fallback: {
-                $mac_attr! {
-                    ($($attr_args)*),
-                    then ($crate::macro_attr_impl! {
-                        @split_attrs_resume
-                        ($($non_derives)*),
-                        $derives,
-                    }),
-                    $(#[$($attrs)*])*
-                    $($it)*
-                }
-            }
+        $mac_attr! {
+            ($($attr_args)*),
+            then ($crate::macro_attr_impl! {
+                @split_attrs_resume
+                ($($non_derives)*),
+                $derives,
+            }),
+            $(#[$($attrs)*])*
+            $($it)*
         }
     };
 
@@ -827,25 +676,12 @@ macro_rules! macro_attr_impl {
         $fixed:tt,
         ($new_drv:ident ~!, $($tail:tt)*), ($($bi_drvs:ident,)*), ($($user_drvs:tt)*)
     ) => {
-        macro_attr_if_proc_macros! {
-            proc_macros: {
-                $crate::macro_attr_impl! {
-                    @split_derive_attrs
-                    $fixed,
-                    ($($tail)*),
-                    ($($bi_drvs,)* $new_drv,),
-                    ($($user_drvs)*)
-                }
-            }
-            fallback: {
-                $crate::macro_attr_impl! {
-                    @split_derive_attrs
-                    $fixed,
-                    ($($tail)*),
-                    ($($bi_drvs,)*),
-                    ($($user_drvs)* $new_drv(),)
-                }
-            }
+        $crate::macro_attr_impl! {
+            @split_derive_attrs
+            $fixed,
+            ($($tail)*),
+            ($($bi_drvs,)*),
+            ($($user_drvs)* $new_drv(),)
         }
     };
 
@@ -926,35 +762,5 @@ macro_rules! macro_attr_callback {
         $($args:tt)*
     ) => {
         $cb! ( $($cb_fixed)* $($args)* )
-    };
-}
-
-/**
-This macro provides a simple way to select between two branches of code, depending on whether or not support for procedural macros is enabled or not.
-*/
-#[doc(hidden)]
-#[macro_export]
-#[cfg(feature="unstable-macros-1-1")]
-macro_rules! macro_attr_if_proc_macros {
-    (
-        proc_macros: { $($items:item)* }
-        fallback: $_ignore:tt
-    ) => {
-        $($items)*
-    };
-}
-
-/**
-This macro provides a simple way to select between two branches of code, depending on whether or not support for procedural macros is enabled or not.
-*/
-#[doc(hidden)]
-#[macro_export]
-#[cfg(not(feature="unstable-macros-1-1"))]
-macro_rules! macro_attr_if_proc_macros {
-    (
-        proc_macros: $_ignore:tt
-        fallback: { $($items:item)* }
-    ) => {
-        $($items)*
     };
 }
