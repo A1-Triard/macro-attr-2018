@@ -10,11 +10,7 @@
 /*!
 This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations.
 
-## Quick Example
-
 The `macro_attr!` macro should be used to wrap an entire *single* item (`enum`, `struct`, *etc.*) declaration, including its attributes (both `derive` and others).  All attributes and derivations which whose names end with `!` will be assumed to be implemented by macros, and treated accordingly.
-
-For example:
 
 ```rust
 use macro_attr_2018::macro_attr;
@@ -33,8 +29,8 @@ trait ReprType {
 
 macro_rules! TypeName {
     // We can support any kind of item we want.
-    (() $vis:vis enum $name:ident $($tail:tt)*) => { TypeName! { @impl $name } };
-    (() $vis:vis struct $name:ident $($tail:tt)*) => { TypeName! { @impl $name } };
+    (() $vis:vis enum $name:ident $($tail:tt)+) => { TypeName! { @impl $name } };
+    (() $vis:vis struct $name:ident $($tail:tt)+) => { TypeName! { @impl $name } };
 
     // Inner rule to cut down on repetition.
     (@impl $name:ident) => {
@@ -46,7 +42,7 @@ macro_rules! TypeName {
 
 macro_rules! ReprType {
     // Note that we use a "derivation argument" here for the `$repr` type.
-    (($repr:ty) $vis:vis enum $name:ident $($tail:tt)*) => {
+    (($repr:ty) $vis:vis enum $name:ident $($tail:tt)+) => {
         impl ReprType for $name {
             type Repr = $repr;
         }
