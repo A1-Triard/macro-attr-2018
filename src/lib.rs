@@ -100,17 +100,6 @@ macro_rules! macro_attr_impl {
 
     */
     (
-        $(#[$attrs:meta])*
-        const $($it:tt)+
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$attrs],)*), (), (),
-            (const $($it)+)
-        }
-    };
-
-    (
         $(#[$($attrs:tt)*])*
         enum $($it:tt)*
     ) => {
@@ -118,50 +107,6 @@ macro_rules! macro_attr_impl {
             @split_attrs
             ($(#[$($attrs)*],)*), (), (),
             (enum $($it)*)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)*])*
-        extern $($it:tt)*
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (extern $($it)*)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)*])*
-        fn $($it:tt)*
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (fn $($it)*)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)*])*
-        impl $($it:tt)*
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (impl $($it)*)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)*])*
-        mod $($it:tt)*
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (mod $($it)*)
         }
     };
 
