@@ -100,46 +100,68 @@ macro_rules! macro_attr_impl {
 
     */
     (
-        $(#[$($attrs:tt)*])*
-        enum $($it:tt)*
+        $(#[$($attrs:tt)+])*
+        enum $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
             @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (enum $($it)*)
+            ($(#[$($attrs)+],)*), (), (),
+            (enum $($it)+)
         }
     };
 
     (
-        $(#[$($attrs:tt)*])*
-        struct $($it:tt)*
+        $(#[$($attrs:tt)+])*
+        struct $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
             @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (struct $($it)*)
+            ($(#[$($attrs)+],)*), (), (),
+            (struct $($it)+)
         }
     };
 
     (
-        $(#[$($attrs:tt)*])*
-        $vis:vis struct $($it:tt)*
+        $(#[$($attrs:tt)+])*
+        trait $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
             @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            ($vis struct $($it)*)
+            ($(#[$($attrs)+],)*), (), (),
+            (trait $($it)+)
         }
     };
 
     (
-        $(#[$($attrs:tt)*])*
-        $vis:vis enum $($it:tt)*
+        $(#[$($attrs:tt)+])*
+        $vis:vis enum $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
             @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            ($vis enum $($it)*)
+            ($(#[$($attrs)+],)*), (), (),
+            ($vis enum $($it)+)
+        }
+    };
+
+    (
+        $(#[$($attrs:tt)+])*
+        $vis:vis struct $($it:tt)+
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_attrs
+            ($(#[$($attrs)+],)*), (), (),
+            ($vis struct $($it)+)
+        }
+    };
+
+    (
+        $(#[$($attrs:tt)+])*
+        $vis:vis trait $($it:tt)+
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_attrs
+            ($(#[$($attrs)+],)*), (), (),
+            ($vis trait $($it)+)
         }
     };
 
