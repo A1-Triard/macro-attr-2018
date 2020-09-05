@@ -100,13 +100,13 @@ macro_rules! macro_attr_impl {
 
     */
     (
-        $(#[$($attrs:tt)*])*
-        const $($it:tt)*
+        $(#[$attrs:meta])*
+        const $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
             @split_attrs
-            ($(#[$($attrs)*],)*), (), (),
-            (const $($it)*)
+            ($(#[$attrs],)*), (), (),
+            (const $($it)+)
         }
     };
 
