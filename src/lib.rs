@@ -122,7 +122,7 @@ fn main() {
 }
 ```
 */
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
 /**
 When given an item definition, including its attributes, this macro parses said attributes and dispatches any attributes or derivations suffixed with `!` to user-defined macros.  This allows multiple macros to process the same item.

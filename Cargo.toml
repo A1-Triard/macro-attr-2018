@@ -18,9 +18,5 @@ members = [
     "tests/derive-name-test",
 ]
 
-[features]
-default = ["std"]
-std = []
-
 [dev-dependencies]
 rustc-serialize = "0.3.15"
