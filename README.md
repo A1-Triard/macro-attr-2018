@@ -1,4 +1,6 @@
-# `macro-attr`
+# `macro-attr-2018`
+
+The [`macro-attr`](https://crates.io/crates/macro-attr) modern fork.
 
 This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations.
 
