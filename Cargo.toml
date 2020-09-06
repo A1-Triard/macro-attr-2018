@@ -19,4 +19,5 @@ members = [
 ]
 
 [dev-dependencies]
+enum_derive = { version = "0.1.7", default-features = false }
 rustc-serialize = "0.3.15"
