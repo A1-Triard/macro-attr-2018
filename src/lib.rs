@@ -78,7 +78,7 @@ Note that macro derives may be mixed with regular derives, or put in their own `
 
 A macro derivation invoked *without* arguments will be treated as though it was invoked with empty parentheses.  *i.e.* `#[derive(Name!)]` is equivalent to `#[derive(Name!())]`.
 
-A derivation macro may expand to any number of new items derived from the provided input.  There is no way for a derivation macro to alter the item itself (for that, use a macro attribute).
+A derivation macro may expand to any number of new items derived from the provided input.
 */
 #[macro_export]
 macro_rules! macro_attr {
