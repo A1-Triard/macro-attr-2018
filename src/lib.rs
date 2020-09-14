@@ -90,277 +90,205 @@ macro_rules! macro_attr {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! macro_attr_impl {
-    /*
-
-    > **Convention**: a capture named `$fixed` is used for any part of a recursive rule that is needed in the terminal case, but is not actually being *used* for the recursive part.  This avoids having to constantly repeat the full capture pattern (and makes changing it easier).
-
-    # Primary Invocation Forms
-
-    These need to catch any valid form of item.
-
-    */
     (
         $(#[$($attrs:tt)+])*
         enum $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)+],)*), (), (),
-            (enum $($it)+)
+            @split_attrs [enum $($it)+]
+            [] []
+            [$([$($attrs)+])*]
         }
     };
-
-    (
-        $(#[$($attrs:tt)+])*
-        struct $($it:tt)+
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)+],)*), (), (),
-            (struct $($it)+)
-        }
-    };
-
-    (
-        $(#[$($attrs:tt)+])*
-        trait $($it:tt)+
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)+],)*), (), (),
-            (trait $($it)+)
-        }
-    };
-
     (
         $(#[$($attrs:tt)+])*
         pub $(($($vis:tt)+))? enum $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)+],)*), (), (),
-            (pub $(($($vis)+))? enum $($it)+)
+            @split_attrs [pub $(($($vis)+))? enum $($it)+]
+            [] []
+            [$([$($attrs)+])*]
         }
     };
-
+    (
+        $(#[$($attrs:tt)+])*
+        struct $($it:tt)+
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_attrs [struct $($it)+]
+            [] []
+            [$([$($attrs)+])*]
+        }
+    };
     (
         $(#[$($attrs:tt)+])*
         pub $(($($vis:tt)+))? struct $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)+],)*), (), (),
-            (pub $(($($vis)+))? struct $($it)+)
+            @split_attrs [pub $(($($vis)+))? struct $($it)+]
+            [] []
+            [$([$($attrs)+])*]
         }
     };
-
+    (
+        $(#[$($attrs:tt)+])*
+        trait $($it:tt)+
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_attrs [trait $($it)+]
+            [] []
+            [$([$($attrs)+])*]
+        }
+    };
     (
         $(#[$($attrs:tt)+])*
         pub $(($($vis:tt)+))? trait $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)+],)*), (), (),
-            (pub $(($($vis)+))? trait $($it)+)
+            @split_attrs [pub $(($($vis)+))? trait $($it)+]
+            [] []
+            [$([$($attrs)+])*]
         }
     };
-
-    /*
-
-    # `@split_attrs`
-
-    This is responsible for dividing all attributes on an item into two groups:
-
-    - `#[derive(...)]`
-    - Everything else.
-
-    As part of this, it also explodes `#[derive(A, B(..), C, ...)]` into `A, B(..), C, ...`.  This is to simplify the next stage.
-
-    */
     (
-        @split_attrs
-        (),
-        $non_derives:tt,
-        $derives:tt,
-        $it:tt
+        @split_attrs [$($it:tt)+]
+        [$($derive_attrs:tt)*] [$([$other_attrs:meta])*]
+        [[derive($($derive_attr:tt)+)] $([$($attrs:tt)+])*]
     ) => {
         $crate::macro_attr_impl! {
-            @split_derive_attrs
-            { $non_derives, $it },
-            $derives,
-            (),
-            ()
+            @split_attrs [$($it)+]
+            [$($derive_attrs)* [$($derive_attr)+]]
+            [$([$other_attrs])*]
+            [$([$($attrs)+])*]
         }
     };
-
     (
-        @split_attrs
-        (#[derive($($new_drvs:tt)*)], $(#[$($attrs:tt)*],)*),
-        $non_derives:tt,
-        ($($derives:tt)*),
-        $it:tt
+        @split_attrs [$($it:tt)+]
+        [$($derive_attrs:tt)*] [$([$other_attrs:meta])*]
+        [[$attr:meta] $([$($attrs:tt)+])*]
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*),
-            $non_derives,
-            ($($derives)* $($new_drvs)*,),
-            $it
+            @split_attrs [$($it)+]
+            [$($derive_attrs)*]
+            [$([$other_attrs])* [$attr]]
+            [$([$($attrs)+])*]
         }
     };
-
     (
-        @split_attrs
-        (#[$new_attr:meta], $(#[$($attrs:tt)*],)*),
-        ($($non_derives:tt)*),
-        $derives:tt,
-        $it:tt
+        @split_attrs [$($it:tt)+]
+        [$($derive_attrs:tt)*] [$([$other_attrs:meta])*]
+        []
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs
-            ($(#[$($attrs)*],)*),
-            ($($non_derives)* #[$new_attr],),
-            $derives,
-            $it
+            @split_derive_attrs [$($it)+] [$([$other_attrs])*]
+            [] []
+            [$($derive_attrs)*]
         }
     };
-
-    /*
-
-    # `@split_derive_attrs`
-
-    This is responsible for taking the list of derivation attributes and splitting them into "built-in" and "custom" groups.
-
-    A custom attribute is any which has a `!` after the name, like a macro.
-    */
-
-    (@split_derive_attrs
-        { ($(#[$($non_derives:tt)*],)*), ($($it:tt)*) },
-        ($(,)*), (), ($($user_drvs:tt)*)
+    (
+        @split_derive_attrs [$($it:tt)+] [$([$other_attrs:meta])*]
+        [$($macro_derives:tt)*] [$($std_derives:tt)*]
+        [
+            [$macro_derive:ident ! $(($($macro_derive_args:tt)*))? $(, $($other_inner_derives:tt)*)?]
+            $([$($other_derives:tt)*])*
+        ]
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_derive_attrs [$($it)+] [$([$other_attrs])*]
+            [
+                $($macro_derives)*
+                [$macro_derive ( $($($macro_derive_args)*)? )]
+            ]
+            [
+                $($std_derives)*
+            ]
+            [
+                $([$($other_inner_derives)*])?
+                $([$($other_derives)*])*
+            ]
+        }
+    };
+    (
+        @split_derive_attrs [$($it:tt)+] [$([$other_attrs:meta])*]
+        [$($macro_derives:tt)*] [$($std_derives:tt)*]
+        [
+            [$std_derive:ident $(($($std_derive_args:tt)*))? $(, $($other_inner_derives:tt)*)?]
+            $([$($other_derives:tt)*])*
+        ]
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_derive_attrs [$($it)+] [$([$other_attrs])*]
+            [
+                $($macro_derives)*
+            ]
+            [
+                $($std_derives)*
+                #[derive($std_derive $(($($std_derive_args)*))?)]
+            ]
+            [
+                $([$($other_inner_derives)*])?
+                $([$($other_derives)*])*
+            ]
+        }
+    };
+    (
+        @split_derive_attrs [$($it:tt)+] [$([$other_attrs:meta])*]
+        [$($macro_derives:tt)*] [$($std_derives:tt)*]
+        [
+            []
+            $([$($other_derives:tt)*])*
+        ]
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_derive_attrs [$($it)+] [$([$other_attrs])*]
+            [
+                $($macro_derives)*
+            ]
+            [
+                $($std_derives)*
+            ]
+            [
+                $([$($other_derives)*])*
+            ]
+        }
+    };
+    (
+        @split_derive_attrs [$($it:tt)+] [$([$other_attrs:meta])*]
+        [$([$macro_derive:ident ( $($macro_derive_args:tt)* )])*]
+        [$($std_derives:tt)*]
+        []
     ) => {
         $crate::macro_attr_impl! {
             @as_item
-            $(#[$($non_derives)*])*
-            $($it)*
+            $($std_derives)*
+            $(#[$other_attrs])*
+            $($it)+
         }
-
         $crate::macro_attr_impl! {
-            @expand_user_drvs
-            ($($user_drvs)*), ($($it)*)
+            @expand [$($it)+]
+            [$([$macro_derive ( $($macro_derive_args)* )])*]
         }
     };
-
-    (@split_derive_attrs
-        { ($(#[$($non_derives:tt)*],)*), ($($it:tt)*) },
-        ($(,)*), ($($bi_drvs:ident,)+), ($($user_drvs:tt)*)
+    (
+        @expand [$($it:tt)+]
+        [
+            [$macro_derive:ident ( $($macro_derive_args:tt)* )]
+            $([$other_macro_derives:ident ( $($other_macro_derives_args:tt)* )])*
+        ]
     ) => {
-        $crate::macro_attr_impl! {
-            @as_item
-            #[derive($($bi_drvs,)+)]
-            $(#[$($non_derives)*])*
-            $($it)*
+        $macro_derive! {
+            ( $($macro_derive_args)* )
+            $($it)+
         }
-
         $crate::macro_attr_impl! {
-            @expand_user_drvs
-            ($($user_drvs)*), ($($it)*)
+            @expand [$($it)+]
+            [$([$other_macro_derives ( $($other_macro_derives_args)* )])*]
         }
     };
-
-    (@split_derive_attrs
-        $fixed:tt,
-        (,, $($tail:tt)*), $bi_drvs:tt, $user_drvs:tt
+    (
+        @expand [$($it:tt)+]
+        []
     ) => {
-        $crate::macro_attr_impl! {
-            @split_derive_attrs
-            $fixed, ($($tail)*), $bi_drvs, $user_drvs
-        }
     };
-
-    (@split_derive_attrs
-        $fixed:tt,
-        (, $($tail:tt)*), $bi_drvs:tt, $user_drvs:tt
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_derive_attrs
-            $fixed, ($($tail)*), $bi_drvs, $user_drvs
-        }
-    };
-
-    /*
-
-    ## Custom Derivations
-
-    Now we can handle the custom derivations.  There are two forms we care about: those *with* an argument, and those *without*.
-
-    The *reason* we care is that, in order to simplify the derivation macros, we want to detect the argument-less case and generate an empty pair of parens.
-
-    */
-    (@split_derive_attrs
-        $fixed:tt,
-        ($new_user:ident ! ($($new_user_args:tt)*), $($tail:tt)*), $bi_drvs:tt, ($($user_drvs:tt)*)
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_derive_attrs
-            $fixed, ($($tail)*), $bi_drvs, ($($user_drvs)* $new_user($($new_user_args)*),)
-        }
-    };
-
-    (@split_derive_attrs
-        $fixed:tt,
-        ($new_user:ident !, $($tail:tt)*), $bi_drvs:tt, ($($user_drvs:tt)*)
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_derive_attrs
-            $fixed, ($($tail)*), $bi_drvs, ($($user_drvs)* $new_user(),)
-        }
-    };
-
-    /*
-
-    ## Non-Macro Derivations
-
-    All the rest.
-
-    */
-    (@split_derive_attrs
-        $fixed:tt,
-        ($drv:ident, $($tail:tt)*), ($($bi_drvs:ident,)*), $user_drvs:tt
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_derive_attrs
-            $fixed,
-            ($($tail)*), ($($bi_drvs,)* $drv,), $user_drvs
-        }
-    };
-
-    /*
-
-    # `@expand_user_drvs`
-
-    Finally, we have a recursive rule for expanding user derivations.  This is basically just using the derivation name as a macro identifier.
-
-    This *has* to be recursive because we need to expand two independent repetition sequences simultaneously, and this causes `macro_rules!` to throw a wobbly.  Don't want that.  So, recursive it is.
-
-    */
-    (@expand_user_drvs
-        (), ($($it:tt)*)
-    ) => {};
-
-    (@expand_user_drvs
-        ($user_drv:ident $arg:tt, $($tail:tt)*), ($($it:tt)*)
-    ) => {
-        $user_drv! { $arg $($it)* }
-        $crate::macro_attr_impl! {
-            @expand_user_drvs
-            ($($tail)*), ($($it)*)
-        }
-    };
-
-    /*
-
-    # Miscellaneous Rules
-
-    */
     (@as_item $($i:item)*) => {$($i)*};
 }
