@@ -7,79 +7,86 @@
 // files in the project carrying such notice may not be copied, modified,
 // or distributed except according to those terms.
 
-/*!
-This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations.
-
-The `macro_attr!` macro should be used to wrap an entire *single* item (`enum`, `struct`, *etc.*) declaration, including its attributes (both `derive` and others).  All attributes and derivations which whose names end with `!` will be assumed to be implemented by macros, and treated accordingly.
-
-```rust
-use macro_attr_2018::macro_attr;
-
-// Define some traits to be derived.
-
-trait TypeName {
-    fn type_name() -> &'static str;
-}
-
-trait ReprType {
-    type Repr;
-}
-
-// Define macros which derive implementations of these macros.
-
-macro_rules! TypeName {
-    // We can support any kind of item we want.
-    (() $vis:vis enum $name:ident $($tail:tt)+) => { TypeName! { @impl $name } };
-    (() $vis:vis struct $name:ident $($tail:tt)+) => { TypeName! { @impl $name } };
-
-    // Inner rule to cut down on repetition.
-    (@impl $name:ident) => {
-        impl TypeName for $name {
-            fn type_name() -> &'static str { stringify!($name) }
-        }
-    };
-}
-
-macro_rules! ReprType {
-    // Note that we use a "derivation argument" here for the `$repr` type.
-    (($repr:ty) $vis:vis enum $name:ident $($tail:tt)+) => {
-        impl ReprType for $name {
-            type Repr = $repr;
-        }
-    };
-}
-```
-*/
+/// This crate provides the `macro_attr!` macro that enables the use of custom,
+/// macro-based attributes and derivations.
+///
+/// The `macro_attr!` macro should be used to wrap an entire *single* item
+/// (`enum`, `struct`, *etc.*) declaration, including its attributes (both `derive` and others).
+/// All attributes and derivations which whose names end with `!` will be assumed
+/// to be implemented by macros, and treated accordingly.
+///
+/// ```rust
+/// use macro_attr_2018::macro_attr;
+///
+/// // Define some traits to be derived.
+///
+/// trait TypeName {
+///     fn type_name() -> &'static str;
+/// }
+///
+/// trait ReprType {
+///     type Repr;
+/// }
+///
+/// // Define macros which derive implementations of these macros.
+///
+/// macro_rules! TypeName {
+///     // We can support any kind of item we want.
+///     (() $vis:vis enum $name:ident $($tail:tt)+) => { TypeName! { @impl $name } };
+///     (() $vis:vis struct $name:ident $($tail:tt)+) => { TypeName! { @impl $name } };
+///
+///     // Inner rule to cut down on repetition.
+///     (@impl $name:ident) => {
+///         impl TypeName for $name {
+///             fn type_name() -> &'static str { stringify!($name) }
+///         }
+///     };
+/// }
+///
+/// macro_rules! ReprType {
+///     // Note that we use a "derivation argument" here for the `$repr` type.
+///     (($repr:ty) $vis:vis enum $name:ident $($tail:tt)+) => {
+///         impl ReprType for $name {
+///             type Repr = $repr;
+///         }
+///     };
+/// }
+/// ```
 
 #![no_std]
 #![deny(warnings)]
 
-/**
-When given an item definition, including its attributes, this macro parses said attributes and dispatches any attributes or derivations suffixed with `!` to user-defined macros.  This allows multiple macros to process the same item.
-
-Given the following input:
-
-```ignore
-#[derive(Copy, Name!(args...), Clone, Another!, Debug)]
-struct Foo;
-```
-
-`macro_attr!` will expand to the equivalent of:
-
-```ignore
-#[derive(Copy, Clone, Debug)]
-struct Foo;
-
-Name!((args...) struct Foo;);
-Another!(() struct Foo;);
-```
-
-Note that macro derives may be mixed with regular derives, or put in their own `#[derive(...)]` attribute.  Also note that macro derive invocations are *not* passed the other attributes on the item; input will consist of the arguments provided to the derivation (*i.e.* `(args...)` in this example), the item's visibility (if any), and the item definition itself.
-
-A macro derivation invoked *without* arguments will be treated as though it was invoked with empty parentheses.  *i.e.* `#[derive(Name!)]` is equivalent to `#[derive(Name!())]`.
-
-A derivation macro may expand to any number of new items derived from the provided input.
-*/
+/// When given an item definition, including its attributes, this macro parses said attributes
+/// and dispatches any attributes or derivations suffixed with `!` to user-defined macros.
+/// This allows multiple macros to process the same item.
+///
+/// Given the following input:
+///
+/// ```ignore
+/// #[derive(Copy, Name!(args...), Clone, Another!, Debug)]
+/// struct Foo;
+/// ```
+///
+/// `macro_attr!` will expand to the equivalent of:
+///
+/// ```ignore
+/// #[derive(Copy, Clone, Debug)]
+/// struct Foo;
+///
+/// Name!((args...) struct Foo;);
+/// Another!(() struct Foo;);
+/// ```
+///
+/// Note that macro derives may be mixed with regular derives,
+/// or put in their own `#[derive(...)]` attribute.
+/// Also note that macro derive invocations are *not* passed the other attributes on the item;
+/// input will consist of the arguments provided to the derivation (*i.e.* `(args...)`
+/// in this example), the item's visibility (if any), and the item definition itself.
+///
+/// A macro derivation invoked *without* arguments will be treated as though
+/// it was invoked with empty parentheses.  *i.e.* `#[derive(Name!)]` is equivalent to `#[derive(Name!())]`.
+///
+/// A derivation macro may expand to any number of new items derived from the provided input.
 #[macro_export]
 macro_rules! macro_attr {
     ($($item:tt)*) => {
