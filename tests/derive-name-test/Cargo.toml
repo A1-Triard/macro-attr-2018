@@ -13,8 +13,4 @@ path = "derive-name-test.rs"
 [dependencies]
 derive-name-macro = { version = "0.1.0", path = "../derive-name-macro" }
 derive-name-proc = { version = "0.1.0", path = "../derive-name-proc", optional = true }
-
-[dependencies.macro-attr-2018]
-version = "0.4.0"
-path = "../.."
-default-features = false
+macro-attr-2018 = { version = "1.0.0", path = "../..", default-features = false }
