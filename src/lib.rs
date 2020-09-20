@@ -129,6 +129,16 @@ macro_rules! macro_attr_impl {
         }
     };
     (
+        $(#[$($attrs:tt)+])*
+        $vis:vis $ty:ident $($it:tt)+
+    ) => {
+        $crate::macro_attr_impl! {
+            @split_attrs [$vis $ty $($it)+]
+            [] []
+            [$([$($attrs)+])*]
+        }
+    };
+    (
         @split_attrs [$($it:tt)+]
         [$($derive_attrs:tt)*] [$([$other_attrs:meta])*]
         [[derive($($derive_attr:tt)+)] $([$($attrs:tt)+])*]
