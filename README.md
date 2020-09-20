@@ -2,9 +2,11 @@
 
 The [`macro-attr`](https://crates.io/crates/macro-attr) modern fork.
 
-This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations.
+This crate provides the `macro_attr!` macro that enables the use of custom, macro-based derivations.
 
-The `macro_attr!` macro should be used to wrap an entire *single* item (`enum`, `struct`, *etc.*) declaration, including its attributes (both `derive` and others).  All attributes and derivations which whose names end with `!` will be assumed to be implemented by macros, and treated accordingly.
+The `macro_attr!` macro should be used to wrap an entire *single* item (`enum`, `struct`, *etc.*) declaration,
+including its attributes (both `derive` and others).
+All derivations which whose names end with `!` will be assumed to be implemented by macros, and treated accordingly.
 
 ```rust
 use macro_attr_2018::macro_attr;
