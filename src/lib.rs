@@ -1,5 +1,6 @@
 // Copyright (c) 2016 macro-attr contributors.
 // Copyright (c) 2020 Warlock <internalmike@gmail.com>.
+// Copyright (c) 2020 Clint Armstrong <clint@clintarmstrong.net>.
 //
 // Licensed under the MIT license (see LICENSE or <http://opensource.org
 // /licenses/MIT>) or the Apache License, Version 2.0 (see LICENSE of
@@ -99,60 +100,40 @@ macro_rules! macro_attr {
 macro_rules! macro_attr_impl {
     (
         $(#[$($attrs:tt)+])*
-        enum $($it:tt)+
+        $(pub $(($($vis:tt)+))?)? enum $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs [enum $($it)+]
+            @split_attrs [$(pub $(($($vis)+))?)? enum $($it)+]
             [] []
             [$([$($attrs)+])*]
         }
     };
     (
         $(#[$($attrs:tt)+])*
-        pub $(($($vis:tt)+))? enum $($it:tt)+
+        $(pub $(($($vis:tt)+))?)? struct $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs [pub $(($($vis)+))? enum $($it)+]
+            @split_attrs [$(pub $(($($vis)+))?)? struct $($it)+]
             [] []
             [$([$($attrs)+])*]
         }
     };
     (
         $(#[$($attrs:tt)+])*
-        struct $($it:tt)+
+        $(pub $(($($vis:tt)+))?)? trait $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs [struct $($it)+]
+            @split_attrs [$(pub ($($vis)+))? trait $($it)+]
             [] []
             [$([$($attrs)+])*]
         }
     };
     (
         $(#[$($attrs:tt)+])*
-        pub $(($($vis:tt)+))? struct $($it:tt)+
+        $vis:vis $ty:ident $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs [pub $(($($vis)+))? struct $($it)+]
-            [] []
-            [$([$($attrs)+])*]
-        }
-    };
-    (
-        $(#[$($attrs:tt)+])*
-        trait $($it:tt)+
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs [trait $($it)+]
-            [] []
-            [$([$($attrs)+])*]
-        }
-    };
-    (
-        $(#[$($attrs:tt)+])*
-        pub $(($($vis:tt)+))? trait $($it:tt)+
-    ) => {
-        $crate::macro_attr_impl! {
-            @split_attrs [pub $(($($vis)+))? trait $($it)+]
+            @split_attrs [$vis $ty $($it)+]
             [] []
             [$([$($attrs)+])*]
         }
