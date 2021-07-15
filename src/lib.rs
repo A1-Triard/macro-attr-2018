@@ -8,9 +8,6 @@
 // files in the project carrying such notice may not be copied, modified,
 // or distributed except according to those terms.
 
-#![no_std]
-#![deny(warnings)]
-
 //! This crate provides the `macro_attr!` macro that enables the use of custom,
 //! macro-based attributes and derivations.
 //!
@@ -56,6 +53,9 @@
 //!     };
 //! }
 //! ```
+
+#![no_std]
+#![deny(warnings)]
 
 /// When given an item definition, including its attributes, this macro parses said attributes
 /// and dispatches any attributes or derivations suffixed with `!` to user-defined macros.

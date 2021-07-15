@@ -10,7 +10,7 @@
 use macro_attr_2018::macro_attr;
 
 macro_attr! {
-    #[derive(Clone, Hash, RustcEncodable, RustcDecodable, PartialEq, Eq, PartialOrd, Ord, Debug, Default, Copy)]
+    #[derive(Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Debug, Default, Copy)]
     pub struct Dummy(u32);
 }
 

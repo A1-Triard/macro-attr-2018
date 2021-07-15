@@ -1,7 +1,7 @@
 [package]
 edition = "2018"
 name = "macro-attr-2018"
-version = "1.1.0"
+version = "1.1.1"
 authors = ["warlock <internalmike@gmail.com>"]
 description = "This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations."
 readme = "README.md"
@@ -10,14 +10,3 @@ keywords = ["custom", "derive", "attribute", "macro"]
 categories = ["rust-patterns", "no-std"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/A1-Triard/macro-attr-2018"
-
-[workspace]
-members = [
-    "tests/derive-name-macro",
-    "tests/derive-name-proc",
-    "tests/derive-name-test",
-]
-
-[dev-dependencies]
-enum_derive = { version = "0.1.7", default-features = false }
-rustc-serialize = "0.3.15"
