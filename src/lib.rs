@@ -23,6 +23,8 @@
 //! to be implemented by macros, and treated accordingly.
 //!
 //! ```rust
+//! use macro_attr_2018::macro_attr;
+//!
 //! // Define some traits to be derived.
 //!
 //! trait TypeName {
@@ -56,6 +58,19 @@
 //!         }
 //!     };
 //! }
+//!
+//! // Derive.
+//!
+//! macro_attr! {
+//!     #[derive(TypeName!, ReprType!(u16))]
+//!     #[repr(u16)]
+//!     enum SomeEnum { A, B, C, D }
+//! }
+//!
+//! # fn main() {
+//! assert_eq!(SomeEnum::type_name(), "SomeEnum");
+//! assert_eq!(SomeEnum::A as <SomeEnum as ReprType>::Repr, 0u16);
+//! # }
 //! ```
 
 #![no_std]

@@ -9,11 +9,6 @@
 
 use macro_attr_2018::macro_attr;
 
-trait TryFrom<Src>: Sized {
-    type Err;
-    fn try_from(src: Src) -> Result<Self, Self::Err>;
-}
-
 macro_rules! TryFrom {
     (($prim:ty) $(pub)* enum $name:ident { $($body:tt)* }) => {
         TryFrom! {
@@ -27,7 +22,7 @@ macro_rules! TryFrom {
         ($(,)*) -> ($($var_names:ident,)*)
     ) => {
         impl TryFrom<$prim> for $name {
-            type Err = $prim;
+            type Error = $prim;
             fn try_from(src: $prim) -> Result<$name, $prim> {
                 $(
                     if src == $name::$var_names as $prim {

@@ -44,4 +44,12 @@ macro_rules! ReprType {
         }
     };
 }
+
+// Derive.
+
+macro_attr! {
+    #[derive(TypeName!, ReprType!(u16))]
+    #[repr(u16)]
+    enum SomeEnum { A, B, C, D }
+}
 ```
