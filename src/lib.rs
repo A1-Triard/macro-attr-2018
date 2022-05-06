@@ -54,8 +54,12 @@
 //! }
 //! ```
 
-#![no_std]
 #![deny(warnings)]
+#![doc(test(attr(deny(warnings))))]
+#![doc(test(attr(allow(dead_code))))]
+#![doc(test(attr(allow(unused_variables))))]
+
+#![no_std]
 
 /// When given an item definition, including its attributes, this macro parses said attributes
 /// and dispatches any attributes or derivations suffixed with `!` to user-defined macros.

@@ -1,7 +1,8 @@
 [package]
 edition = "2018"
 name = "macro-attr-2018"
-version = "1.1.1"
+version = "1.1.2"
+rust-version = "1.46"
 authors = ["warlock <internalmike@gmail.com>"]
 description = "This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations."
 readme = "README.md"
