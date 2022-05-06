@@ -8,6 +8,12 @@
 // files in the project carrying such notice may not be copied, modified,
 // or distributed except according to those terms.
 
+#![deny(warnings)]
+#![doc(test(attr(deny(warnings))))]
+#![doc(test(attr(allow(dead_code))))]
+#![doc(test(attr(allow(unused_variables))))]
+#![doc(test(attr(allow(unused_macros))))]
+
 //! This crate provides the `macro_attr!` macro that enables the use of custom,
 //! macro-based attributes and derivations.
 //!
@@ -17,8 +23,6 @@
 //! to be implemented by macros, and treated accordingly.
 //!
 //! ```rust
-//! use macro_attr_2018::macro_attr;
-//!
 //! // Define some traits to be derived.
 //!
 //! trait TypeName {
@@ -53,11 +57,6 @@
 //!     };
 //! }
 //! ```
-
-#![deny(warnings)]
-#![doc(test(attr(deny(warnings))))]
-#![doc(test(attr(allow(dead_code))))]
-#![doc(test(attr(allow(unused_variables))))]
 
 #![no_std]
 
