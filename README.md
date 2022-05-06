@@ -13,7 +13,7 @@ use macro_attr_2018::macro_attr;
 
 // Define some traits to be derived.
 
-t rait TypeName {
+trait TypeName {
     fn type_name() -> &'static str;
 }
 
