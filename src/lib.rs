@@ -78,7 +78,7 @@
 include!("doc_test_readme.include");
 
 /// When given an item definition, including its attributes, this macro parses said attributes
-/// and dispatches any attributes or derivations suffixed with `!` to user-defined macros.
+/// and dispatches any derivations suffixed with `!` to user-defined macros.
 /// This allows multiple macros to process the same item.
 ///
 /// Given the following input:
