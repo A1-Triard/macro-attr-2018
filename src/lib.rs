@@ -60,7 +60,6 @@
 
 #![no_std]
 
-#[cfg(all(test))]
 include!("doc_test_readme.include");
 
 /// When given an item definition, including its attributes, this macro parses said attributes

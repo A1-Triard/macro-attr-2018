@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        rust: ["1.46", "1.54", stable, beta]
+        rust: ["1.60", stable, beta]
         triple: [""]
         include:
         - os: ubuntu-latest
@@ -46,13 +46,11 @@ jobs:
       with:
         command: test
         args: "--verbose --tests"
-      if: "${{ matrix.rust != '1.46' }}"
     - name: test --doc
       uses: actions-rs/cargo@v1
       with:
         command: test
         args: "--verbose --doc"
-      if: "${{ matrix.rust != '1.46' }}"
     - name: doc
       uses: actions-rs/cargo@v1
       with:
