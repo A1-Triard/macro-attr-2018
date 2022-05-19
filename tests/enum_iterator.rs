@@ -7,6 +7,8 @@
 // files in the project carrying such notice may not be copied, modified,
 // or distributed except according to those terms.
 
+#![deny(warnings)]
+
 use macro_attr_2018::macro_attr;
 
 macro_rules! EnumIterator {
@@ -45,19 +47,6 @@ macro_rules! EnumIterator {
             @collect_variants $fixed,
             ($($tail)*) -> ($($var_names)* $var,)
         }
-    };
-
-    (
-        @collect_variants ($name:ident),
-        ($var:ident $_struct:tt, $($tail:tt)*) -> ($($var_names:tt)*)
-    ) => {
-        const _error: () = concat!(
-            "cannot derive EnumIterator for ",
-            stringify!($name),
-            ", due to non-unitary variant ",
-            stringify!($var),
-            "."
-        );
     };
 }
 
