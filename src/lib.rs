@@ -110,14 +110,6 @@ include!("doc_test_readme.include");
 /// A derivation macro may expand to any number of new items derived from the provided input.
 #[macro_export]
 macro_rules! macro_attr {
-    ($($item:tt)*) => {
-        $crate::macro_attr_impl! { $($item)* }
-    };
-}
-
-#[doc(hidden)]
-#[macro_export]
-macro_rules! macro_attr_impl {
     (
         $(#[$($attrs:tt)+])*
         $(pub $(($($vis:tt)+))?)? enum $($it:tt)+
@@ -150,14 +142,19 @@ macro_rules! macro_attr_impl {
     };
     (
         $(#[$($attrs:tt)+])*
-        $vis:vis $ty:ident $($it:tt)+
+        $vis:vis $keyword:ident $($it:tt)+
     ) => {
         $crate::macro_attr_impl! {
-            @split_attrs [$vis $ty $($it)+]
+            @split_attrs [$vis $keyword $($it)+]
             [] []
             [$([$($attrs)+])*]
         }
     };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! macro_attr_impl {
     (
         @split_attrs [$($it:tt)+]
         [$($derive_attrs:tt)*] [$([$other_attrs:meta])*]
