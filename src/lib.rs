@@ -13,7 +13,7 @@
 #![doc(test(attr(allow(dead_code))))]
 #![doc(test(attr(allow(unused_variables))))]
 #![doc(test(attr(allow(unused_macros))))]
-#![cfg_attr(rustc_1_62, doc(test(attr(allow(unused_macro_rules)))))]
+#![cfg_attr(rustc_1_63, doc(test(attr(allow(unused_macro_rules)))))]
 
 //! This crate provides the `macro_attr!` macro that enables the use of custom,
 //! macro-based attributes and derivations.
