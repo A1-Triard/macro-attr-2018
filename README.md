@@ -1,3 +1,5 @@
+![maintenance: passively maintained](https://img.shields.io/badge/maintenance-passively--maintained-yellowgreen.svg)
+
 # `macro-attr-2018`
 
 The [`macro-attr`](https://crates.io/crates/macro-attr) modern fork.

@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "macro-attr-2018"
-version = "2.1.0"
+version = "2.1.1"
 rust-version = "1.60"
 authors = ["warlock <internalmike@gmail.com>"]
 description = "This crate provides the `macro_attr!` macro that enables the use of custom, macro-based attributes and derivations."
@@ -14,3 +14,6 @@ repository = "https://github.com/A1-Triard/macro-attr-2018"
 
 [build-dependencies]
 rustc_version = "0.4.0"
+
+[badges]
+maintenance = { status = "passively-maintained" }
