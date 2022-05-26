@@ -12,9 +12,5 @@ categories = ["rust-patterns", "no-std"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/A1-Triard/macro-attr-2018"
 
-[build-dependencies]
-rustc_version = "0.4.0"
-semver = "1.0.9"
-
 [badges]
 maintenance = { status = "passively-maintained" }
