@@ -76,7 +76,8 @@
 
 #![no_std]
 
-include!("doc_test_readme.include");
+#[doc=include_str!("../README.md")]
+type _DocTestReadme = ();
 
 /// When given an item definition, including its attributes, this macro parses said attributes
 /// and dispatches any derivations suffixed with `!` to user-defined macros.
