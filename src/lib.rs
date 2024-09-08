@@ -81,6 +81,7 @@ type _DocTestReadme = ();
 
 /// When given an item definition, including its attributes, this macro parses said attributes
 /// and dispatches any derivations suffixed with `!` to user-defined macros.
+///
 /// This allows multiple macros to process the same item.
 ///
 /// Given the following input:
